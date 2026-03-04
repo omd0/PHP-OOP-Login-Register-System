@@ -5,28 +5,46 @@
 
 require_once 'core/init.php';
 
-if(Session::exists('home')) {
-    echo '<p>' . Session::flash('home'). '</p>';
-}
+$page_title = 'Home';
+$user = new User();
 
-$user = new User(); //Current
-
-if($user->isLoggedIn()) {
+require_once 'includes/header.php';
 ?>
 
-    <p>Hello, <a href="profile.php?user=<?php echo escape($user->data()->username);?>"><?php echo escape($user->data()->username); ?></p>
+<?php if(Session::exists('home')): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?php echo escape(Session::flash('home')); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
 
-    <ul>
-        <li><a href="update.php">Update Profile</a></li>
-        <li><a href="changepassword.php">Change Password</a></li>
-        <li><a href="logout.php">Log out</a></li>
-    </ul>
-<?php
+<?php if($user->isLoggedIn()): ?>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">
+                Welcome back, <a href="profile.php?user=<?php echo escape($user->data()->username); ?>">
+                    <?php echo escape($user->data()->username); ?>
+                </a>!
+            </h4>
 
-    if($user->hasPermission('admin')) {
-        echo '<p>You are a Administrator!</p>';
-    }
+            <?php if($user->hasPermission('admin')): ?>
+                <span class="badge bg-danger mb-3">Administrator</span>
+            <?php endif; ?>
 
-} else {
-    echo '<p>You need to <a href="login.php">login</a> or <a href="register.php">register.</a></p>';
-}
+            <ul class="list-group list-group-flush mt-3">
+                <li class="list-group-item"><a href="update.php" class="text-decoration-none">Update Profile</a></li>
+                <li class="list-group-item"><a href="changepassword.php" class="text-decoration-none">Change Password</a></li>
+                <li class="list-group-item"><a href="logout.php" class="text-decoration-none text-danger">Log out</a></li>
+            </ul>
+        </div>
+    </div>
+<?php else: ?>
+    <div class="text-center mt-5">
+        <h2>Welcome to PHP OOP Auth</h2>
+        <p class="text-muted">Please login or create an account to continue.</p>
+        <a href="login.php" class="btn btn-primary me-2">Login</a>
+        <a href="register.php" class="btn btn-outline-secondary">Register</a>
+    </div>
+<?php endif; ?>
+
+<?php require_once 'includes/footer.php'; ?>
