@@ -1,6 +1,8 @@
 <?php
 /**
- * Created by Chris on 9/29/2014 3:56 PM.
+ * CSRF token: generate a one-time token for forms, check on submit (learning project).
+ * - generate(): store in session and return value for <input type="hidden" name="token">.
+ * - check($token): compare with session and delete so form can't be replayed.
  */
 
 class Token {

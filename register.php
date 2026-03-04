@@ -1,14 +1,19 @@
 <?php
 /**
- * Created by Chris on 9/29/2014 3:53 PM.
+ * Register page: create account with name, username, password, and account type (learning project).
+ * - Account type is chosen via Group class (OOP); validated with Group::isValidId().
+ * - Password is hashed (bcrypt) before storing; never save plain text.
  */
 
 require_once 'core/init.php';
 
 $user = new User();
+$group = new Group();
+$registerError = null;
+$registerErrors = array();
 
 if (Input::exists()) {
-    if(Token::check(Input::get('token'))) {
+    if (Token::check(Input::get('token'))) {
         $validate = new Validate();
         $validate->check($_POST, array(
             'name' => array(
@@ -35,26 +40,34 @@ if (Input::exists()) {
             ),
         ));
 
-        if ($validate->passed()) {
+        // OOP validation: account type must be a valid group id (e.g. 1 = Standard, 2 = Admin)
+        $accountType = (int) Input::get('account_type');
+        if (!$group->isValidId($accountType)) {
+            $registerErrors[] = 'Please choose a valid account type.';
+        }
+
+        if ($validate->passed() && empty($registerErrors)) {
             try {
                 $user->create(array(
                     'name' => Input::get('name'),
                     'username' => Input::get('username'),
                     'password' => Hash::encryptPassword(Input::get('password')),
                     'joined' => date('Y-m-d H:i:s'),
-                    'group' => 1
+                    'group' => $accountType
                 ));
 
                 Session::flash('home', 'Welcome ' . Input::get('username') . '! Your account has been registered. You may now log in.');
                 Redirect::to('index.php');
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $registerError = $e->getMessage();
             }
         } else {
-            $registerErrors = $validate->errors();
+            $registerErrors = array_merge($registerErrors, $validate->errors());
         }
     }
 }
+
+$accountTypes = $group->getAll();
 
 $pageTitle = 'Register';
 require_once 'includes/header.php';
@@ -82,6 +95,17 @@ if (!empty($registerErrors)) {
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" name="username" id="username" value="<?php echo escape(Input::get('username')); ?>" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="account_type" class="form-label">Account type</label>
+                <select name="account_type" id="account_type" class="form-select" required>
+                    <?php foreach ($accountTypes as $g): ?>
+                    <option value="<?php echo (int) $g->id; ?>" <?php echo (Input::get('account_type') === (string) $g->id) ? 'selected' : ''; ?>>
+                        <?php echo escape($g->name); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+                <small class="text-muted">Standard User or Administrator (admin can access the Admin dashboard).</small>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>

@@ -1,6 +1,11 @@
 <?php
 /**
- * Created by Chris on 9/29/2014 3:54 PM.
+ * Database layer: singleton PDO wrapper (learning project).
+ * - getInstance(): one shared connection.
+ * - get($table, $where): SELECT * FROM table WHERE field = ?
+ * - insert($table, $fields): INSERT with bound params.
+ * - update($table, $id, $fields): UPDATE table SET ... WHERE id = ?
+ * - delete($table, $where): DELETE with 3-element where array.
  */
 
 class DB {

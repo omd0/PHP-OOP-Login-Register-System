@@ -1,6 +1,7 @@
 <?php
 /**
- * Created by Chris on 9/29/2014 3:52 PM.
+ * Login page: form + validation + optional "Remember me" (learning project).
+ * - POST with valid token: validate username/password, then User::login() and redirect or show error.
  */
 
 require_once 'core/init.php';
@@ -9,20 +10,21 @@ $user = new User();
 $loginError = null;
 $loginErrors = array();
 
-if(Input::exists()) {
-    if(Token::check(Input::get('token'))) {
-
+// Only process when form was submitted (POST)
+if (Input::exists()) {
+    // CSRF protection: token must match the one stored in session when form was shown
+    if (Token::check(Input::get('token'))) {
         $validate = new Validate();
         $validate->check($_POST, array(
             'username' => array('required' => true),
             'password' => array('required' => true)
         ));
 
-        if($validate->passed()) {
-            $remember = (Input::get('remember') === 'on') ? true : false;
+        if ($validate->passed()) {
+            $remember = (Input::get('remember') === 'on');
             $login = $user->login(Input::get('username'), Input::get('password'), $remember);
 
-            if($login) {
+            if ($login) {
                 Redirect::to('index.php');
             } else {
                 $loginError = 'Incorrect username or password';

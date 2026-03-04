@@ -1,21 +1,22 @@
 <?php
 /**
- * Created by Chris on 9/29/2014 3:53 PM.
+ * Change Password page: current password + new password (learning project).
+ * - User must be logged in. Current password is verified before updating.
  */
 
 require_once 'core/init.php';
 
 $user = new User();
 
-if(!$user->isLoggedIn()) {
+if (!$user->isLoggedIn()) {
     Redirect::to('index.php');
 }
 
 $changePasswordError = null;
 $changePasswordErrors = array();
 
-if(Input::exists()) {
-    if(Token::check(Input::get('token'))) {
+if (Input::exists()) {
+    if (Token::check(Input::get('token'))) {
         $validate = new Validate();
         $validate->check($_POST, array(
             'current_password' => array(

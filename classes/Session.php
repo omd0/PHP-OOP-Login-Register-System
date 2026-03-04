@@ -1,6 +1,7 @@
 <?php
 /**
- * Created by Chris on 9/29/2014 3:56 PM.
+ * Session helpers: put, get, delete, and one-time flash messages (learning project).
+ * flash($name, $string): set message for next page; flash($name): read and remove it.
  */
 
 class Session {
