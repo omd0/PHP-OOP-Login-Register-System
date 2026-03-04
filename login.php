@@ -5,6 +5,10 @@
 
 require_once 'core/init.php';
 
+$user = new User();
+$pageTitle = 'Login';
+require_once 'includes/header.php';
+
 if(Input::exists()) {
     if(Token::check(Input::get('token'))) {
 
@@ -15,42 +19,45 @@ if(Input::exists()) {
         ));
 
         if($validate->passed()) {
-            $user = new User();
-
             $remember = (Input::get('remember') === 'on') ? true : false;
             $login = $user->login(Input::get('username'), Input::get('password'), $remember);
 
             if($login) {
                 Redirect::to('index.php');
             } else {
-                echo '<p>Incorrect username or password</p>';
+                echo '<div class="alert alert-danger">Incorrect username or password</div>';
             }
         } else {
+            echo '<div class="alert alert-danger"><ul class="mb-0">';
             foreach($validate->errors() as $error) {
-                echo $error, '<br>';
+                echo '<li>' . escape($error) . '</li>';
             }
+            echo '</ul></div>';
         }
     }
 }
 ?>
 
-<form action="" method="post">
-    <div class="field">
-        <label for='username'>Username</label>
-        <input type="text" name="username" id="username">
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <h2 class="mb-4">Login</h2>
+        <form action="" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" name="username" id="username" class="form-control" value="<?php echo escape(Input::get('username')); ?>">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control">
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="remember" id="remember" class="form-check-input">
+                <label for="remember" class="form-check-label">Remember me</label>
+            </div>
+            <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
     </div>
+</div>
 
-    <div class="field">
-        <label for='password'>Password</label>
-        <input type="password" name="password" id="password">
-    </div>
-
-    <div class="field">
-        <label for="remember">
-            <input type="checkbox" name="remember" id="remember">Remember me
-        </label>
-    </div>
-
-    <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
-    <input type="submit" value="Login">
-</form>
+<?php require_once 'includes/footer.php'; ?>

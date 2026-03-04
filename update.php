@@ -11,6 +11,9 @@ if(!$user->isLoggedIn()) {
     Redirect::to('index.php');
 }
 
+$pageTitle = 'Update Profile';
+require_once 'includes/header.php';
+
 if(Input::exists()) {
     if(Token::check(Input::get('token'))) {
         $validate = new Validate();
@@ -32,23 +35,31 @@ if(Input::exists()) {
                 Redirect::to('index.php');
 
             } catch(Exception $e) {
-                die($e->getMessage());
+                echo '<div class="alert alert-danger">' . escape($e->getMessage()) . '</div>';
             }
         } else {
+            echo '<div class="alert alert-danger"><ul class="mb-0">';
             foreach($validate->errors() as $error) {
-                echo $error, '<br>';
+                echo '<li>' . escape($error) . '</li>';
             }
+            echo '</ul></div>';
         }
     }
 }
 ?>
 
-<form action="" method="post">
-    <div class="field">
-        <label for="name">Name</label>
-        <input type="text" name="name" value="<?php echo escape($user->data()->name); ?>">
-
-        <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
-        <input type="submit" value="Update">
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <h2 class="mb-4">Update Profile</h2>
+        <form action="" method="post">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" name="name" id="name" value="<?php echo escape($user->data()->name); ?>" class="form-control">
+            </div>
+            <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
     </div>
-</form>
+</div>
+
+<?php require_once 'includes/footer.php'; ?>

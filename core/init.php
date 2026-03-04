@@ -7,10 +7,10 @@ session_start();
 
 $GLOBALS['config'] = array(
     'mysql' => array(
-        'host' => '127.0.0.1',
-        'username' => 'root',
-        'password' => '',
-        'db' => 'php_oop',
+        'host' => getenv('DB_HOST') ?: '127.0.0.1',
+        'username' => getenv('DB_USER') ?: 'root',
+        'password' => getenv('DB_PASS') ?: '',
+        'db' => getenv('DB_NAME') ?: 'php_oop',
         'charset' => 'utf8mb4'
     ),
     'remember' => array(

@@ -5,28 +5,23 @@
 
 require_once 'core/init.php';
 
-if(Session::exists('home')) {
-    echo '<p>' . Session::flash('home'). '</p>';
-}
+$user = new User();
+$pageTitle = 'Home';
+require_once 'includes/header.php';
 
-$user = new User(); //Current
+if(Session::exists('home')) {
+    echo '<div class="alert alert-success">' . Session::flash('home') . '</div>';
+}
 
 if($user->isLoggedIn()) {
 ?>
-
-    <p>Hello, <a href="profile.php?user=<?php echo escape($user->data()->username);?>"><?php echo escape($user->data()->username); ?></p>
-
-    <ul>
-        <li><a href="update.php">Update Profile</a></li>
-        <li><a href="changepassword.php">Change Password</a></li>
-        <li><a href="logout.php">Log out</a></li>
-    </ul>
+    <p class="lead">Hello, <a href="profile.php?user=<?php echo escape($user->data()->username);?>"><?php echo escape($user->data()->username); ?></a></p>
+    <?php if($user->hasPermission('admin')): ?>
+        <p class="badge bg-warning text-dark">Administrator</p>
+    <?php endif; ?>
 <?php
-
-    if($user->hasPermission('admin')) {
-        echo '<p>You are a Administrator!</p>';
-    }
-
 } else {
-    echo '<p>You need to <a href="login.php">login</a> or <a href="register.php">register.</a></p>';
+    echo '<p class="lead">You need to <a href="login.php">login</a> or <a href="register.php">register</a>.</p>';
 }
+
+require_once 'includes/footer.php';
