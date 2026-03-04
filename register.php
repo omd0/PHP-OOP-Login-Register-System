@@ -6,8 +6,6 @@
 require_once 'core/init.php';
 
 $user = new User();
-$pageTitle = 'Register';
-require_once 'includes/header.php';
 
 if (Input::exists()) {
     if(Token::check(Input::get('token'))) {
@@ -50,16 +48,26 @@ if (Input::exists()) {
                 Session::flash('home', 'Welcome ' . Input::get('username') . '! Your account has been registered. You may now log in.');
                 Redirect::to('index.php');
             } catch(Exception $e) {
-                echo '<div class="alert alert-danger">' . escape($e->getMessage()) . '</div>';
+                $registerError = $e->getMessage();
             }
         } else {
-            echo '<div class="alert alert-danger"><ul class="mb-0">';
-            foreach ($validate->errors() as $error) {
-                echo '<li>' . escape($error) . '</li>';
-            }
-            echo '</ul></div>';
+            $registerErrors = $validate->errors();
         }
     }
+}
+
+$pageTitle = 'Register';
+require_once 'includes/header.php';
+
+if (!empty($registerError)) {
+    echo '<div class="alert alert-danger">' . escape($registerError) . '</div>';
+}
+if (!empty($registerErrors)) {
+    echo '<div class="alert alert-danger"><ul class="mb-0">';
+    foreach ($registerErrors as $error) {
+        echo '<li>' . escape($error) . '</li>';
+    }
+    echo '</ul></div>';
 }
 ?>
 

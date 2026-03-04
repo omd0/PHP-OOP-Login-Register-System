@@ -11,8 +11,8 @@ if(!$user->isLoggedIn()) {
     Redirect::to('index.php');
 }
 
-$pageTitle = 'Update Profile';
-require_once 'includes/header.php';
+$updateError = null;
+$updateErrors = array();
 
 if(Input::exists()) {
     if(Token::check(Input::get('token'))) {
@@ -35,16 +35,26 @@ if(Input::exists()) {
                 Redirect::to('index.php');
 
             } catch(Exception $e) {
-                echo '<div class="alert alert-danger">' . escape($e->getMessage()) . '</div>';
+                $updateError = $e->getMessage();
             }
         } else {
-            echo '<div class="alert alert-danger"><ul class="mb-0">';
-            foreach($validate->errors() as $error) {
-                echo '<li>' . escape($error) . '</li>';
-            }
-            echo '</ul></div>';
+            $updateErrors = $validate->errors();
         }
     }
+}
+
+$pageTitle = 'Update Profile';
+require_once 'includes/header.php';
+
+if ($updateError) {
+    echo '<div class="alert alert-danger">' . escape($updateError) . '</div>';
+}
+if (!empty($updateErrors)) {
+    echo '<div class="alert alert-danger"><ul class="mb-0">';
+    foreach($updateErrors as $error) {
+        echo '<li>' . escape($error) . '</li>';
+    }
+    echo '</ul></div>';
 }
 ?>
 

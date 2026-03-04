@@ -6,8 +6,8 @@
 require_once 'core/init.php';
 
 $user = new User();
-$pageTitle = 'Login';
-require_once 'includes/header.php';
+$loginError = null;
+$loginErrors = array();
 
 if(Input::exists()) {
     if(Token::check(Input::get('token'))) {
@@ -25,16 +25,26 @@ if(Input::exists()) {
             if($login) {
                 Redirect::to('index.php');
             } else {
-                echo '<div class="alert alert-danger">Incorrect username or password</div>';
+                $loginError = 'Incorrect username or password';
             }
         } else {
-            echo '<div class="alert alert-danger"><ul class="mb-0">';
-            foreach($validate->errors() as $error) {
-                echo '<li>' . escape($error) . '</li>';
-            }
-            echo '</ul></div>';
+            $loginErrors = $validate->errors();
         }
     }
+}
+
+$pageTitle = 'Login';
+require_once 'includes/header.php';
+
+if ($loginError) {
+    echo '<div class="alert alert-danger">' . escape($loginError) . '</div>';
+}
+if (!empty($loginErrors)) {
+    echo '<div class="alert alert-danger"><ul class="mb-0">';
+    foreach($loginErrors as $error) {
+        echo '<li>' . escape($error) . '</li>';
+    }
+    echo '</ul></div>';
 }
 ?>
 

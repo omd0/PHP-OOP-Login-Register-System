@@ -11,8 +11,8 @@ if(!$user->isLoggedIn()) {
     Redirect::to('index.php');
 }
 
-$pageTitle = 'Change Password';
-require_once 'includes/header.php';
+$changePasswordError = null;
+$changePasswordErrors = array();
 
 if(Input::exists()) {
     if(Token::check(Input::get('token'))) {
@@ -35,7 +35,7 @@ if(Input::exists()) {
 
         if($validate->passed()) {
             if(!Hash::isValidPassword(Input::get('current_password'), $user->data()->password)){
-                echo '<div class="alert alert-danger">Your current password is wrong.</div>';
+                $changePasswordError = 'Your current password is wrong.';
             } else {
                 $user->update(array(
                     'password' => Hash::encryptPassword(Input::get('new_password'))
@@ -45,13 +45,23 @@ if(Input::exists()) {
                 Redirect::to('index.php');
             }
         } else {
-            echo '<div class="alert alert-danger"><ul class="mb-0">';
-            foreach($validate->errors() as $error) {
-                echo '<li>' . escape($error) . '</li>';
-            }
-            echo '</ul></div>';
+            $changePasswordErrors = $validate->errors();
         }
     }
+}
+
+$pageTitle = 'Change Password';
+require_once 'includes/header.php';
+
+if ($changePasswordError) {
+    echo '<div class="alert alert-danger">' . escape($changePasswordError) . '</div>';
+}
+if (!empty($changePasswordErrors)) {
+    echo '<div class="alert alert-danger"><ul class="mb-0">';
+    foreach($changePasswordErrors as $error) {
+        echo '<li>' . escape($error) . '</li>';
+    }
+    echo '</ul></div>';
 }
 ?>
 
